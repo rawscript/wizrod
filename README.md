@@ -2,7 +2,7 @@
 ![Wizrod Banner](https://res.cloudinary.com/dp7vwr0av/image/upload/v1789720358/Wizrod_ko5kwt.png)
 
 Wizrod is a native Windows clipboard history MVP. Copy text normally, then press **Ctrl + Alt + V** to open its floating glass-style palette. Search matches instantly, recents are shown by default, and settings controls retention and the favourites view.
-[img]{https://res.cloudinary.com/dp7vwr0av/image/upload/v1789720358/Wizrod_ko5kwt.png}
+
 ## Run from a build
 
 After `dotnet build`, start the normal Windows executable directly:
