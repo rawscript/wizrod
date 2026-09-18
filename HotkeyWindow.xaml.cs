@@ -11,6 +11,7 @@ public partial class HotkeyWindow : Window
     private const int HotkeyId = 734;
     private readonly ClipboardService _clipboard;
     private bool _favoritesOnly;
+    private bool _hasPosition;
     public event Action? ShowRequested;
 
     public HotkeyWindow(ClipboardService clipboard)
@@ -30,11 +31,19 @@ public partial class HotkeyWindow : Window
 
     public void ShowAtCursor()
     {
-        _favoritesOnly = false; SettingsPanel.Visibility = Visibility.Collapsed; SearchBox.Clear();
+        _favoritesOnly = false;
+        SettingsPanel.Visibility = Visibility.Collapsed;
+        ContentPanel.Visibility = Visibility.Collapsed;
+        MenuPanel.Visibility = Visibility.Visible;
+        SearchBox.Clear();
         RefreshItems();
-        GetCursorPos(out var p);
-        Left = Math.Max(12, Math.Min(p.X - Width / 2, SystemParameters.WorkArea.Right - Width - 12));
-        Top = Math.Max(12, Math.Min(p.Y - 90, SystemParameters.WorkArea.Bottom - Height - 12));
+        if (!_hasPosition)
+        {
+            GetCursorPos(out var p);
+            Left = Math.Max(12, Math.Min(p.X - Width / 2, SystemParameters.WorkArea.Right - Width - 12));
+            Top = Math.Max(12, Math.Min(p.Y - 90, SystemParameters.WorkArea.Bottom - Height - 12));
+            _hasPosition = true;
+        }
         Show(); Activate(); Focus();
     }
     private void RefreshItems()
@@ -46,7 +55,6 @@ public partial class HotkeyWindow : Window
         if (!string.IsNullOrWhiteSpace(query)) entries = entries.Where(x => x.Text.Contains(query, StringComparison.OrdinalIgnoreCase));
         var results = entries.ToList();
         ItemsList.ItemsSource = results;
-        ItemCount.Text = results.Count == 1 ? "1 item" : $"{results.Count} items";
     }
     private IntPtr WndProc(IntPtr h, int message, IntPtr w, IntPtr l, ref bool handled)
     {
@@ -62,10 +70,45 @@ public partial class HotkeyWindow : Window
         if (((System.Windows.Controls.ListBoxItem)sender).DataContext is ClipboardItem item)
             _clipboard.ToggleFavorite(item);
     }
-    private void Recents_Click(object sender, RoutedEventArgs e) { _favoritesOnly = false; SettingsPanel.Visibility = Visibility.Collapsed; RefreshItems(); }
-    private void Favorites_Click(object sender, RoutedEventArgs e) { _favoritesOnly = true; SettingsPanel.Visibility = Visibility.Collapsed; RefreshItems(); }
-    private void Settings_Click(object sender, RoutedEventArgs e) => SettingsPanel.Visibility = SettingsPanel.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-    private void SearchBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) => RefreshItems();
+    private void Recents_Click(object sender, RoutedEventArgs e)
+    {
+        _favoritesOnly = false;
+        ShowLibrary("Library");
+    }
+    private void Favorites_Click(object sender, RoutedEventArgs e)
+    {
+        _favoritesOnly = true;
+        ShowLibrary("Favourites");
+    }
+    private void Settings_Click(object sender, RoutedEventArgs e)
+    {
+        MenuPanel.Visibility = Visibility.Collapsed;
+        ContentPanel.Visibility = Visibility.Visible;
+        ItemsList.Visibility = Visibility.Collapsed;
+        SettingsPanel.Visibility = Visibility.Visible;
+        PanelTitle.Text = "Settings";
+    }
+    private void SearchBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        RefreshItems();
+        if (!string.IsNullOrWhiteSpace(SearchBox.Text)) ShowLibrary("Search results");
+    }
+    private void Back_Click(object sender, RoutedEventArgs e)
+    {
+        ContentPanel.Visibility = Visibility.Collapsed;
+        MenuPanel.Visibility = Visibility.Visible;
+        SettingsPanel.Visibility = Visibility.Collapsed;
+        SearchBox.Clear();
+    }
+    private void ShowLibrary(string title)
+    {
+        MenuPanel.Visibility = Visibility.Collapsed;
+        ContentPanel.Visibility = Visibility.Visible;
+        SettingsPanel.Visibility = Visibility.Collapsed;
+        ItemsList.Visibility = Visibility.Visible;
+        PanelTitle.Text = title;
+        RefreshItems();
+    }
     private void RetentionPicker_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
         if (_clipboard is null || RetentionPicker.SelectedIndex < 0) return;
@@ -76,8 +119,23 @@ public partial class HotkeyWindow : Window
     {
         if (_clipboard is null) return;
         _clipboard.FavoritesEnabled = FavoritesToggle.IsChecked == true;
-        FavoritesColumn.Width = _clipboard.FavoritesEnabled ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
         FavoritesButton.Visibility = _clipboard.FavoritesEnabled ? Visibility.Visible : Visibility.Collapsed;
+    }
+    private void Shell_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.OriginalSource is DependencyObject source && FindParent<System.Windows.Controls.Button>(source) is not null) return;
+        if (e.OriginalSource is DependencyObject textSource && FindParent<System.Windows.Controls.TextBox>(textSource) is not null) return;
+        DragMove();
+        _hasPosition = true;
+    }
+    private static T? FindParent<T>(DependencyObject source) where T : DependencyObject
+    {
+        while (source is not null)
+        {
+            if (source is T match) return match;
+            source = System.Windows.Media.VisualTreeHelper.GetParent(source);
+        }
+        return null;
     }
     private void Window_Deactivated(object sender, EventArgs e) { if (IsVisible) Hide(); }
     private void Window_KeyDown(object sender, KeyEventArgs e) { if (e.Key == Key.Escape) Hide(); }

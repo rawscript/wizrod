@@ -23,3 +23,9 @@ D:\projects\Wizrod\bin\Verify\Wizrod.deps.json
 D:\projects\Wizrod\bin\Verify\Wizrod.runtimeconfig.json
 D:\projects\Wizrod\bin\Verify\Wizrod.dll
 D:\projects\Wizrod\bin\Verify\Wizrod.pdb
+D:\projects\Wizrod\obj\Debug\net8.0-windows\Wizrod.sourcelink.json
+D:\projects\Wizrod\bin\Verify2\Wizrod.exe
+D:\projects\Wizrod\bin\Verify2\Wizrod.deps.json
+D:\projects\Wizrod\bin\Verify2\Wizrod.runtimeconfig.json
+D:\projects\Wizrod\bin\Verify2\Wizrod.dll
+D:\projects\Wizrod\bin\Verify2\Wizrod.pdb
