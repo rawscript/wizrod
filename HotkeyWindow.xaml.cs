@@ -13,6 +13,7 @@ public partial class HotkeyWindow : Window
     private bool _favoritesOnly;
     private bool _hasPosition;
     private bool _showingContent;
+    private IntPtr _pasteDestination;
     public event Action? ShowRequested;
 
     public HotkeyWindow(ClipboardService clipboard)
@@ -32,6 +33,7 @@ public partial class HotkeyWindow : Window
 
     public void ShowAtCursor()
     {
+        _pasteDestination = GetForegroundWindow();
         _favoritesOnly = false;
         SettingsPanel.Visibility = Visibility.Collapsed;
         ContentPanel.Visibility = Visibility.Collapsed;
@@ -47,7 +49,7 @@ public partial class HotkeyWindow : Window
             Top = Math.Max(12, Math.Min(p.Y - 90, SystemParameters.WorkArea.Bottom - Height - 12));
             _hasPosition = true;
         }
-        Show(); Activate(); Focus();
+        Show();
     }
     private void RefreshItems()
     {
@@ -66,7 +68,7 @@ public partial class HotkeyWindow : Window
     }
     private void ItemsList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
-        if (ItemsList.SelectedItem is ClipboardItem item) { Hide(); _clipboard.Paste(item); ItemsList.SelectedItem = null; }
+        if (ItemsList.SelectedItem is ClipboardItem item) { Hide(); _clipboard.Paste(item, _pasteDestination); ItemsList.SelectedItem = null; }
     }
     private void Item_Favorite(object sender, MouseButtonEventArgs e)
     {
@@ -165,10 +167,11 @@ public partial class HotkeyWindow : Window
         }
         return null;
     }
-    private void Window_Deactivated(object sender, EventArgs e) { if (IsVisible) Hide(); }
+    private void Window_Deactivated(object sender, EventArgs e) { }
     private void Window_KeyDown(object sender, KeyEventArgs e) { if (e.Key == Key.Escape) Hide(); }
     [DllImport("user32.dll")] private static extern bool RegisterHotKey(IntPtr hwnd, int id, uint modifiers, uint key);
     [DllImport("user32.dll")] private static extern bool UnregisterHotKey(IntPtr hwnd, int id);
     [DllImport("user32.dll")] private static extern bool GetCursorPos(out Point point);
+    [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
     [StructLayout(LayoutKind.Sequential)] private struct Point { public int X; public int Y; }
 }

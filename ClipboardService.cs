@@ -24,9 +24,14 @@ public sealed class ClipboardService : IDisposable
     }
 
     public void Start() => AddClipboardFormatListener(_source.Handle);
-    public void Paste(ClipboardItem item)
+    public void Paste(ClipboardItem item, IntPtr destination)
     {
         Clipboard.SetText(item.Text);
+        if (destination != IntPtr.Zero)
+        {
+            SetForegroundWindow(destination);
+            Thread.Sleep(35);
+        }
         KeyboardPaste();
     }
     public void ToggleFavorite(ClipboardItem item)
@@ -74,4 +79,5 @@ public sealed class ClipboardService : IDisposable
     [DllImport("user32.dll")] private static extern bool AddClipboardFormatListener(IntPtr hwnd);
     [DllImport("user32.dll")] private static extern bool RemoveClipboardFormatListener(IntPtr hwnd);
     [DllImport("user32.dll")] private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+    [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hwnd);
 }
