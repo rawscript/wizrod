@@ -14,6 +14,7 @@ public partial class HotkeyWindow : Window
     private bool _hasPosition;
     private bool _showingContent;
     private IntPtr _pasteDestination;
+    private IntPtr _pasteControl;
     public event Action? ShowRequested;
 
     public HotkeyWindow(ClipboardService clipboard)
@@ -25,7 +26,8 @@ public partial class HotkeyWindow : Window
         {
             var source = (HwndSource)PresentationSource.FromVisual(this);
             source.AddHook(WndProc);
-            RegisterHotKey(source.Handle, HotkeyId, 0x0001 | 0x0002, 0x56);
+            if (!RegisterHotKey(source.Handle, HotkeyId, 0x0001 | 0x0002, 0x56))
+                MessageBox.Show("Ctrl + Alt + V is unavailable. Another program is using it.", "Wizrod", MessageBoxButton.OK, MessageBoxImage.Warning);
         };
         Closed += (_, _) => { var h = new WindowInteropHelper(this).Handle; if (h != IntPtr.Zero) UnregisterHotKey(h, HotkeyId); };
         RefreshItems();
@@ -34,6 +36,7 @@ public partial class HotkeyWindow : Window
     public void ShowAtCursor()
     {
         _pasteDestination = GetForegroundWindow();
+        _pasteControl = GetFocusedControl(_pasteDestination);
         _favoritesOnly = false;
         SettingsPanel.Visibility = Visibility.Collapsed;
         ContentPanel.Visibility = Visibility.Collapsed;
@@ -67,9 +70,15 @@ public partial class HotkeyWindow : Window
         if (message == WmHotkey && w.ToInt32() == HotkeyId) { ShowRequested?.Invoke(); handled = true; }
         return IntPtr.Zero;
     }
-    private void ItemsList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    private async void ItemsList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
-        if (ItemsList.SelectedItem is ClipboardItem item) { Hide(); _clipboard.Paste(item, _pasteDestination); ItemsList.SelectedItem = null; }
+        if (ItemsList.SelectedItem is ClipboardItem item)
+        {
+            ItemsList.SelectedItem = null;
+            Hide();
+            await Task.Delay(140);
+            _clipboard.Paste(item, _pasteDestination, _pasteControl);
+        }
     }
     private void Item_Favorite(object sender, MouseButtonEventArgs e)
     {
@@ -174,5 +183,26 @@ public partial class HotkeyWindow : Window
     [DllImport("user32.dll")] private static extern bool UnregisterHotKey(IntPtr hwnd, int id);
     [DllImport("user32.dll")] private static extern bool GetCursorPos(out Point point);
     [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr hwnd, IntPtr processId);
+    [DllImport("user32.dll")] private static extern bool GetGUIThreadInfo(uint threadId, ref GuiThreadInfo info);
+    private static IntPtr GetFocusedControl(IntPtr window)
+    {
+        if (window == IntPtr.Zero) return IntPtr.Zero;
+        var info = new GuiThreadInfo { Size = (uint)Marshal.SizeOf<GuiThreadInfo>() };
+        return GetGUIThreadInfo(GetWindowThreadProcessId(window, IntPtr.Zero), ref info) ? info.Focus : IntPtr.Zero;
+    }
+    [StructLayout(LayoutKind.Sequential)] private struct GuiThreadInfo
+    {
+        public uint Size;
+        public uint Flags;
+        public IntPtr Active;
+        public IntPtr Focus;
+        public IntPtr Capture;
+        public IntPtr MenuOwner;
+        public IntPtr MoveSize;
+        public IntPtr Caret;
+        public RECT CaretRect;
+    }
+    [StructLayout(LayoutKind.Sequential)] private struct RECT { public int Left; public int Top; public int Right; public int Bottom; }
     [StructLayout(LayoutKind.Sequential)] private struct Point { public int X; public int Y; }
 }
