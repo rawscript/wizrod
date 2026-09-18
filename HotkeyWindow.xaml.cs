@@ -60,6 +60,7 @@ public partial class HotkeyWindow : Window
         if (!string.IsNullOrWhiteSpace(query)) entries = entries.Where(x => x.Text.Contains(query, StringComparison.OrdinalIgnoreCase));
         var results = entries.ToList();
         ItemsList.ItemsSource = results;
+        ItemCount.Text = results.Count == 1 ? "1 item" : $"{results.Count} items";
     }
     private IntPtr WndProc(IntPtr h, int message, IntPtr w, IntPtr l, ref bool handled)
     {
@@ -96,7 +97,7 @@ public partial class HotkeyWindow : Window
         MenuPanel.Visibility = Visibility.Collapsed;
         ContentPanel.Visibility = Visibility.Visible;
         _showingContent = true;
-        Height = Math.Max(Height, 410);
+        Height = Math.Max(Height, 500);
         ItemsList.Visibility = Visibility.Collapsed;
         SettingsPanel.Visibility = Visibility.Visible;
         PanelTitle.Text = "Settings";
@@ -120,7 +121,7 @@ public partial class HotkeyWindow : Window
         MenuPanel.Visibility = Visibility.Collapsed;
         ContentPanel.Visibility = Visibility.Visible;
         _showingContent = true;
-        Height = Math.Max(Height, 410);
+        Height = Math.Max(Height, 500);
         SettingsPanel.Visibility = Visibility.Collapsed;
         ItemsList.Visibility = Visibility.Visible;
         PanelTitle.Text = title;

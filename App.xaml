@@ -39,5 +39,13 @@
         <Setter.Value><ControlTemplate TargetType="ComboBox"><Grid><ToggleButton x:Name="Toggle" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" Focusable="False"><Grid><ContentPresenter Margin="{TemplateBinding Padding}" Content="{TemplateBinding SelectionBoxItem}" VerticalAlignment="Center"/><Path Data="M 0,0 L 8,0 L 4,5 Z" Fill="#FFFBE0" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,13,0"/></Grid></ToggleButton><Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True" PopupAnimation="Fade"><Border Margin="0,5,0,0" Background="#EE354321" BorderBrush="#DFFFEFA0" BorderThickness="1" CornerRadius="12" MinWidth="{Binding ActualWidth, ElementName=Toggle}"><ScrollViewer MaxHeight="180"><ItemsPresenter /></ScrollViewer></Border></Popup></Grid></ControlTemplate></Setter.Value>
       </Setter>
     </Style>
+    <Style x:Key="LibraryScrollBar" TargetType="ScrollBar">
+      <Setter Property="Width" Value="8" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Margin" Value="7,4,0,4" />
+      <Setter Property="Template">
+        <Setter.Value><ControlTemplate TargetType="ScrollBar"><Grid Background="Transparent"><Track x:Name="PART_Track" IsDirectionReversed="True"><Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageUpCommand" Background="Transparent" BorderThickness="0" /></Track.DecreaseRepeatButton><Track.Thumb><Thumb><Thumb.Template><ControlTemplate TargetType="Thumb"><Border Background="#83FFF3A0" BorderBrush="#D6FFF9B8" BorderThickness="1" CornerRadius="4" /></ControlTemplate></Thumb.Template></Thumb></Track.Thumb><Track.IncreaseRepeatButton><RepeatButton Command="ScrollBar.PageDownCommand" Background="Transparent" BorderThickness="0" /></Track.IncreaseRepeatButton></Track></Grid></ControlTemplate></Setter.Value>
+      </Setter>
+    </Style>
   </Application.Resources>
 </Application>
