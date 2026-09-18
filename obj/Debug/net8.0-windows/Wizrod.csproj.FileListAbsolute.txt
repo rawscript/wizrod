@@ -29,3 +29,13 @@ D:\projects\Wizrod\bin\Verify2\Wizrod.deps.json
 D:\projects\Wizrod\bin\Verify2\Wizrod.runtimeconfig.json
 D:\projects\Wizrod\bin\Verify2\Wizrod.dll
 D:\projects\Wizrod\bin\Verify2\Wizrod.pdb
+D:\projects\Wizrod\bin\Verify3\Wizrod.exe
+D:\projects\Wizrod\bin\Verify3\Wizrod.deps.json
+D:\projects\Wizrod\bin\Verify3\Wizrod.runtimeconfig.json
+D:\projects\Wizrod\bin\Verify3\Wizrod.dll
+D:\projects\Wizrod\bin\Verify3\Wizrod.pdb
+D:\projects\Wizrod\bin\Verify4\Wizrod.exe
+D:\projects\Wizrod\bin\Verify4\Wizrod.deps.json
+D:\projects\Wizrod\bin\Verify4\Wizrod.runtimeconfig.json
+D:\projects\Wizrod\bin\Verify4\Wizrod.dll
+D:\projects\Wizrod\bin\Verify4\Wizrod.pdb

@@ -12,6 +12,7 @@ public partial class HotkeyWindow : Window
     private readonly ClipboardService _clipboard;
     private bool _favoritesOnly;
     private bool _hasPosition;
+    private bool _showingContent;
     public event Action? ShowRequested;
 
     public HotkeyWindow(ClipboardService clipboard)
@@ -35,6 +36,8 @@ public partial class HotkeyWindow : Window
         SettingsPanel.Visibility = Visibility.Collapsed;
         ContentPanel.Visibility = Visibility.Collapsed;
         MenuPanel.Visibility = Visibility.Visible;
+        _showingContent = false;
+        UpdateWindowHeight();
         SearchBox.Clear();
         RefreshItems();
         if (!_hasPosition)
@@ -70,6 +73,12 @@ public partial class HotkeyWindow : Window
         if (((System.Windows.Controls.ListBoxItem)sender).DataContext is ClipboardItem item)
             _clipboard.ToggleFavorite(item);
     }
+    private void Favorite_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { }
+    private void Favorite_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is System.Windows.Controls.Button { DataContext: ClipboardItem item })
+            _clipboard.ToggleFavorite(item);
+    }
     private void Recents_Click(object sender, RoutedEventArgs e)
     {
         _favoritesOnly = false;
@@ -84,6 +93,8 @@ public partial class HotkeyWindow : Window
     {
         MenuPanel.Visibility = Visibility.Collapsed;
         ContentPanel.Visibility = Visibility.Visible;
+        _showingContent = true;
+        Height = Math.Max(Height, 410);
         ItemsList.Visibility = Visibility.Collapsed;
         SettingsPanel.Visibility = Visibility.Visible;
         PanelTitle.Text = "Settings";
@@ -97,6 +108,8 @@ public partial class HotkeyWindow : Window
     {
         ContentPanel.Visibility = Visibility.Collapsed;
         MenuPanel.Visibility = Visibility.Visible;
+        _showingContent = false;
+        UpdateWindowHeight();
         SettingsPanel.Visibility = Visibility.Collapsed;
         SearchBox.Clear();
     }
@@ -104,6 +117,8 @@ public partial class HotkeyWindow : Window
     {
         MenuPanel.Visibility = Visibility.Collapsed;
         ContentPanel.Visibility = Visibility.Visible;
+        _showingContent = true;
+        Height = Math.Max(Height, 410);
         SettingsPanel.Visibility = Visibility.Collapsed;
         ItemsList.Visibility = Visibility.Visible;
         PanelTitle.Text = title;
@@ -115,11 +130,24 @@ public partial class HotkeyWindow : Window
         _clipboard.RetentionDays = RetentionPicker.SelectedIndex switch { 0 => 1, 1 => 7, 2 => 14, 3 => 30, _ => int.MaxValue };
         _clipboard.ClearExpired();
     }
+    private void FavoriteRetentionPicker_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (_clipboard is null || FavoriteRetentionPicker.SelectedIndex < 0) return;
+        _clipboard.FavoriteRetentionDays = FavoriteRetentionPicker.SelectedIndex switch { 0 => 7, 1 => 30, 2 => 90, 3 => 365, _ => int.MaxValue };
+        _clipboard.ClearExpired();
+    }
     private void FavoritesToggle_Changed(object sender, RoutedEventArgs e)
     {
         if (_clipboard is null) return;
         _clipboard.FavoritesEnabled = FavoritesToggle.IsChecked == true;
         FavoritesButton.Visibility = _clipboard.FavoritesEnabled ? Visibility.Visible : Visibility.Collapsed;
+        FavoriteRetentionSection.Visibility = _clipboard.FavoritesEnabled ? Visibility.Visible : Visibility.Collapsed;
+        UpdateWindowHeight();
+    }
+    private void UpdateWindowHeight()
+    {
+        if (!_showingContent)
+            Height = _clipboard.FavoritesEnabled ? 340 : 285;
     }
     private void Shell_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {

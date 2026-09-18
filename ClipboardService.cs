@@ -12,6 +12,7 @@ public sealed class ClipboardService : IDisposable
     private readonly List<ClipboardItem> _items = [];
     public ReadOnlyCollection<ClipboardItem> Items => _items.AsReadOnly();
     public int RetentionDays { get; set; } = 14;
+    public int FavoriteRetentionDays { get; set; } = 90;
     public bool FavoritesEnabled { get; set; } = true;
     public event Action? Changed;
 
@@ -32,13 +33,17 @@ public sealed class ClipboardService : IDisposable
     {
         var index = _items.FindIndex(x => x.Id == item.Id);
         if (index < 0) return;
-        _items[index] = item with { IsFavorite = !item.IsFavorite };
+        var isFavorite = !item.IsFavorite;
+        _items[index] = item with { IsFavorite = isFavorite, FavoritedAt = isFavorite ? DateTimeOffset.Now : null };
         Changed?.Invoke();
     }
     public void ClearExpired()
     {
         var cutoff = DateTimeOffset.Now.AddDays(-RetentionDays);
-        _items.RemoveAll(x => !x.IsFavorite && x.CapturedAt < cutoff);
+        var favoriteCutoff = DateTimeOffset.Now.AddDays(-FavoriteRetentionDays);
+        _items.RemoveAll(x => x.IsFavorite
+            ? FavoriteRetentionDays != int.MaxValue && (x.FavoritedAt ?? x.CapturedAt) < favoriteCutoff
+            : x.CapturedAt < cutoff);
         Changed?.Invoke();
     }
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
