@@ -58,7 +58,7 @@ public sealed class ClipboardService : IDisposable
             if (_items.Count > 250) _items.RemoveRange(250, _items.Count - 250);
             ClearExpired();
         }
-        catch (COMException) { } // Clipboard can be locked briefly by another app.
+        catch (COMException) { }
     }
     private static void KeyboardPaste()
     {

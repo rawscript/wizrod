@@ -22,7 +22,7 @@ public partial class HotkeyWindow : Window
         {
             var source = (HwndSource)PresentationSource.FromVisual(this);
             source.AddHook(WndProc);
-            RegisterHotKey(source.Handle, HotkeyId, 0x0001 | 0x0002, 0x56); // Alt + Ctrl + V
+            RegisterHotKey(source.Handle, HotkeyId, 0x0001 | 0x0002, 0x56);
         };
         Closed += (_, _) => { var h = new WindowInteropHelper(this).Handle; if (h != IntPtr.Zero) UnregisterHotKey(h, HotkeyId); };
         RefreshItems();
@@ -30,7 +30,7 @@ public partial class HotkeyWindow : Window
 
     public void ShowAtCursor()
     {
-        _favoritesOnly = false; SearchPanel.Visibility = Visibility.Collapsed; SettingsPanel.Visibility = Visibility.Collapsed; SearchBox.Clear();
+        _favoritesOnly = false; SettingsPanel.Visibility = Visibility.Collapsed; SearchBox.Clear();
         RefreshItems();
         GetCursorPos(out var p);
         Left = Math.Max(12, Math.Min(p.X - Width / 2, SystemParameters.WorkArea.Right - Width - 12));
@@ -44,7 +44,9 @@ public partial class HotkeyWindow : Window
         IEnumerable<ClipboardItem> entries = _clipboard.Items;
         if (_favoritesOnly) entries = entries.Where(x => x.IsFavorite);
         if (!string.IsNullOrWhiteSpace(query)) entries = entries.Where(x => x.Text.Contains(query, StringComparison.OrdinalIgnoreCase));
-        ItemsList.ItemsSource = entries.ToList();
+        var results = entries.ToList();
+        ItemsList.ItemsSource = results;
+        ItemCount.Text = results.Count == 1 ? "1 item" : $"{results.Count} items";
     }
     private IntPtr WndProc(IntPtr h, int message, IntPtr w, IntPtr l, ref bool handled)
     {
@@ -60,7 +62,6 @@ public partial class HotkeyWindow : Window
         if (((System.Windows.Controls.ListBoxItem)sender).DataContext is ClipboardItem item)
             _clipboard.ToggleFavorite(item);
     }
-    private void Search_Click(object sender, RoutedEventArgs e) { SettingsPanel.Visibility = Visibility.Collapsed; SearchPanel.Visibility = Visibility.Visible; SearchBox.Focus(); }
     private void Recents_Click(object sender, RoutedEventArgs e) { _favoritesOnly = false; SettingsPanel.Visibility = Visibility.Collapsed; RefreshItems(); }
     private void Favorites_Click(object sender, RoutedEventArgs e) { _favoritesOnly = true; SettingsPanel.Visibility = Visibility.Collapsed; RefreshItems(); }
     private void Settings_Click(object sender, RoutedEventArgs e) => SettingsPanel.Visibility = SettingsPanel.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;

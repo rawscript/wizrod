@@ -15,7 +15,6 @@ public partial class App : Application
         _window = new HotkeyWindow(_clipboard);
         _window.ShowRequested += () => _window.ShowAtCursor();
         _window.Closed += (_, _) => Shutdown();
-        // Creating the native handle registers the global hotkey before the window is hidden.
         _window.Show();
         _window.Hide();
     }

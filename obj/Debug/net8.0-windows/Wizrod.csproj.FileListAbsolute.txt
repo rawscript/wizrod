@@ -18,3 +18,8 @@ D:\projects\Wizrod\obj\Debug\net8.0-windows\refint\Wizrod.dll
 D:\projects\Wizrod\obj\Debug\net8.0-windows\Wizrod.pdb
 D:\projects\Wizrod\obj\Debug\net8.0-windows\Wizrod.genruntimeconfig.cache
 D:\projects\Wizrod\obj\Debug\net8.0-windows\ref\Wizrod.dll
+D:\projects\Wizrod\bin\Verify\Wizrod.exe
+D:\projects\Wizrod\bin\Verify\Wizrod.deps.json
+D:\projects\Wizrod\bin\Verify\Wizrod.runtimeconfig.json
+D:\projects\Wizrod\bin\Verify\Wizrod.dll
+D:\projects\Wizrod\bin\Verify\Wizrod.pdb
