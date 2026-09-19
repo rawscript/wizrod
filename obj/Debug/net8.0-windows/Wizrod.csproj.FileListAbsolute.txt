@@ -74,3 +74,8 @@ D:\projects\Wizrod\bin\Verify11\Wizrod.deps.json
 D:\projects\Wizrod\bin\Verify11\Wizrod.runtimeconfig.json
 D:\projects\Wizrod\bin\Verify11\Wizrod.dll
 D:\projects\Wizrod\bin\Verify11\Wizrod.pdb
+D:\projects\Wizrod\bin\Verify12\Wizrod.exe
+D:\projects\Wizrod\bin\Verify12\Wizrod.deps.json
+D:\projects\Wizrod\bin\Verify12\Wizrod.runtimeconfig.json
+D:\projects\Wizrod\bin\Verify12\Wizrod.dll
+D:\projects\Wizrod\bin\Verify12\Wizrod.pdb

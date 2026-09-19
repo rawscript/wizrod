@@ -37,14 +37,9 @@ public sealed class ClipboardService : IDisposable
     public bool Paste(ClipboardItem item, IntPtr destination, IntPtr focusedControl)
     {
         if (!TrySetClipboardText(item.Text)) return false;
-        if (focusedControl != IntPtr.Zero)
-        {
-            SendMessage(focusedControl, 0x0302, IntPtr.Zero, IntPtr.Zero);
-            return true;
-        }
         if (destination != IntPtr.Zero)
         {
-            RestoreDestination(destination);
+            RestoreDestination(destination, focusedControl);
             Thread.Sleep(100);
         }
         KeyboardPaste();
@@ -126,7 +121,7 @@ public sealed class ClipboardService : IDisposable
         catch (IOException) { }
         catch (UnauthorizedAccessException) { }
     }
-    private static void RestoreDestination(IntPtr destination)
+    private static void RestoreDestination(IntPtr destination, IntPtr focusedControl)
     {
         var currentThread = GetCurrentThreadId();
         var destinationThread = GetWindowThreadProcessId(destination, IntPtr.Zero);
@@ -136,7 +131,7 @@ public sealed class ClipboardService : IDisposable
             BringWindowToTop(destination);
             SetForegroundWindow(destination);
             SetActiveWindow(destination);
-            SetFocus(destination);
+            SetFocus(focusedControl != IntPtr.Zero ? focusedControl : destination);
         }
         finally
         {
@@ -153,7 +148,6 @@ public sealed class ClipboardService : IDisposable
     [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr hwnd, IntPtr processId);
     [DllImport("kernel32.dll")] private static extern uint GetCurrentThreadId();
     [DllImport("user32.dll")] private static extern bool AttachThreadInput(uint firstThread, uint secondThread, bool attach);
-    [DllImport("user32.dll")] private static extern IntPtr SendMessage(IntPtr hwnd, uint message, IntPtr wParam, IntPtr lParam);
     [DllImport("user32.dll", SetLastError = true)] private static extern uint SendInput(uint count, Input[] inputs, int size);
     [StructLayout(LayoutKind.Sequential)] private struct Input
     {

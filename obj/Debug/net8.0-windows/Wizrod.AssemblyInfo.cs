@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Wizrod")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+be89e49a234068f763318dde23594a81ed3192ed")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+81c900b2506c3f5438275fb1c6c17a232b60a1a9")]
 [assembly: System.Reflection.AssemblyProductAttribute("Wizrod")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Wizrod")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

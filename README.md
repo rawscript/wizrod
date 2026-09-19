@@ -19,4 +19,4 @@ Create a self-contained executable that does not require the .NET SDK or a Power
 dotnet publish -p:PublishProfile=PortableWindows
 ```
 
-The resulting app is `publish\Wizrod.exe`. Copy it to any Windows 64-bit PC and open it normally. The app stays in memory with no taskbar window. Copy text from any app, focus the destination, press `Ctrl + Alt + V`, then select a card to paste it. This first version intentionally stores text only and keeps history in memory; image/file capture and persistent encrypted history are the next production steps.
+The resulting app is `publish\Wizrod.exe`. Copy it to a permanent location on any Windows 64-bit PC and open it once normally. Wizrod registers itself to start automatically for that Windows user after every sign-in. The app stays in memory with no taskbar window. Copy text from any app, focus the destination, press `Ctrl + Alt + V`, then select a card to paste it. This first version intentionally stores text only and keeps history in memory; image/file capture and persistent encrypted history are the next production steps.

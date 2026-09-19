@@ -20,6 +20,7 @@ public partial class App : Application
             Shutdown();
             return;
         }
+        StartupRegistration.EnsureRegistered();
         _clipboard = new ClipboardService();
         _clipboard.Start();
         _window = new HotkeyWindow(_clipboard);
