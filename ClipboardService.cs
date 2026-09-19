@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Automation;
 
 namespace Wizrod;
 
@@ -36,6 +37,11 @@ public sealed class ClipboardService : IDisposable
     }
     public bool Paste(ClipboardItem item, IntPtr destination, IntPtr focusedControl)
     {
+        // Try direct text insertion via EM_REPLACESEL (doesn't modify clipboard)
+        if (focusedControl != IntPtr.Zero && TryInsertTextDirect(focusedControl, item.Text))
+            return true;
+
+        // Fallback to clipboard + Ctrl+V
         if (!TrySetClipboardText(item.Text)) return false;
         if (destination != IntPtr.Zero)
         {
@@ -44,6 +50,72 @@ public sealed class ClipboardService : IDisposable
         }
         KeyboardPaste();
         return true;
+    }
+
+    private static bool TryInsertTextDirect(IntPtr controlHandle, string text)
+    {
+        // Try EM_REPLACESEL - works with standard Windows edit controls
+        // This inserts text at current caret position without using clipboard
+        const int EM_REPLACESEL = 0x00C2;
+        try
+        {
+            // First check if this is an edit control we can send messages to
+            var className = new char[256];
+            GetClassName(controlHandle, className, 256);
+            var classNameStr = new string(className).TrimEnd('\0');
+            
+            // Check for common edit control class names
+            if (classNameStr.Contains("Edit", StringComparison.OrdinalIgnoreCase) ||
+                classNameStr.Contains("TextBox", StringComparison.OrdinalIgnoreCase) ||
+                classNameStr.Contains("RichEdit", StringComparison.OrdinalIgnoreCase))
+            {
+                // Send EM_REPLACESEL message - wParam=TRUE means undoable, lParam=text
+                var result = SendMessage(controlHandle, EM_REPLACESEL, IntPtr.Zero, text);
+                return true;
+            }
+        }
+        catch
+        {
+            // Fall through to UI Automation or clipboard
+        }
+
+        // Try UI Automation as secondary option
+        return TryPasteWithUIAutomation(controlHandle, text);
+    }
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern int GetClassName(IntPtr hWnd, char[] lpClassName, int nMaxCount);
+    
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, string lParam);
+
+    private static bool TryPasteWithUIAutomation(IntPtr controlHandle, string text)
+    {
+        try
+        {
+            var element = AutomationElement.FromHandle(controlHandle);
+            if (element == null) return false;
+
+            if (!element.Current.IsEnabled || !element.Current.IsKeyboardFocusable)
+                return false;
+
+            // Try ValuePattern - but only if current text is empty (SetValue replaces all text)
+            if (element.TryGetCurrentPattern(ValuePattern.Pattern, out var pattern) && pattern is ValuePattern valuePattern)
+            {
+                var currentValue = valuePattern.Current.Value;
+                if (string.IsNullOrEmpty(currentValue))
+                {
+                    valuePattern.SetValue(text);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
     }
     public void ToggleFavorite(ClipboardItem item)
     {

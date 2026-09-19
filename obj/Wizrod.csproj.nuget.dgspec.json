@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\projects\\Wizrod\\Wizrod.csproj": {}
+    "d:\\projects\\Wizrod\\Wizrod.csproj": {}
   },
   "projects": {
-    "D:\\projects\\Wizrod\\Wizrod.csproj": {
+    "d:\\projects\\Wizrod\\Wizrod.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\projects\\Wizrod\\Wizrod.csproj",
+        "projectUniqueName": "d:\\projects\\Wizrod\\Wizrod.csproj",
         "projectName": "Wizrod",
-        "projectPath": "D:\\projects\\Wizrod\\Wizrod.csproj",
+        "projectPath": "d:\\projects\\Wizrod\\Wizrod.csproj",
         "packagesPath": "C:\\Users\\LENOVO T14\\.nuget\\packages\\",
-        "outputPath": "D:\\projects\\Wizrod\\obj\\",
+        "outputPath": "d:\\projects\\Wizrod\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\LENOVO T14\\AppData\\Roaming\\NuGet\\NuGet.Config"
